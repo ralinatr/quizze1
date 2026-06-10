@@ -14,7 +14,6 @@
         .stats { display: flex; justify-content: space-between; background: #162447; padding: 10px; border-radius: 8px; font-size: 0.9rem; }
         .highlight { color: #4facfe; font-weight: bold; }
         
-        /* Квадратное игровое поле для сетки 2х2 */
         #game-board { 
             width: 100%; 
             aspect-ratio: 1 / 1; 
@@ -31,7 +30,6 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
         }
         
-        /* Стилизация 4 фигурных кусочков пазла */
         .piece { 
             position: absolute;
             background: #0f3460; 
@@ -47,7 +45,7 @@
         .piece:hover { background: #162447; filter: brightness(1.2); }
         .piece.hidden { opacity: 0; pointer-events: none; transform: scale(0.9); }
 
-        /* Фигурные маски для сетки 2х2 (настоящие замковые края) */
+        /* Фигурные маски для сетки 2х2 */
         .p0 { left: 0%; top: 0%; width: 56%; height: 56%; clip-path: polygon(0% 0%, 100% 0%, 100% 35%, 85% 35%, 85% 65%, 100% 65%, 100% 100%, 65% 100%, 65% 85%, 35% 85%, 35% 100%, 0% 100%); }
         .p1 { left: 50%; top: 0%; width: 50%; height: 56%; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 65%, 15% 65%, 15% 35%, 0% 35%); }
         .p2 { left: 0%; top: 50%; width: 56%; height: 50%; clip-path: polygon(0% 0%, 65% 0%, 65% 15%, 35% 15%, 35% 0%, 100% 0%, 100% 100%, 0% 100%); }
@@ -113,16 +111,17 @@
     <script>
         const SECRET_PASSWORD = "hoshi2026"; 
 
-        // LEVEL 1: 4 PIECES WITH HIGH SCHOOL MATH QUESTIONS
+        // LEVEL 1: YOUR PHOTO AND 9-10 GRADE RUSSIAN SCHOOL MATH QUESTIONS (IN ENGLISH)
         const gameLevels = [
             {
-                image: "https://unsplash.com", // Lips photo
+                // Ссылка преобразована для прямого скачивания изображения из вашего Google Диска
+                image: "https://drive.google.com/uc?export=download&id=1WDVHSfE_QP0Y2kzrg-J1VBNSWDOQdtjZ", 
                 answer: "lips", 
                 questions: [
-                    "Is the derivative of sin(x) equal to cos(x)?",                // Piece 1 (Yes)
-                    "Is log(1) equal to 1?",                                        // Piece 2 (No, it's 0)
-                    "Does a quadratic equation with a negative discriminant (D < 0) have real roots?", // Piece 3 (No, complex roots)
-                    "Is the value of cos(π) equal to -1?"                           // Piece 4 (Yes)
+                    "If the discriminant of a quadratic equation is greater than zero (D > 0), does it have two distinct real roots?", // Piece 1 (Yes)
+                    "Is any number to the power of zero equal to zero (x^0 = 0)?",                                               // Piece 2 (No, it is 1)
+                    "If a parabola equation is y = -x^2 + 4, do its branches point upwards?",                                    // Piece 3 (No, they point downwards)
+                    "Is the value of sin(30°) equal to 0.5?"                                                                     // Piece 4 (Yes)
                 ],
                 keys: [true, false, false, true] // Correct answers: Yes, No, No, Yes
             }
@@ -132,7 +131,7 @@
         let totalScore = 0;
         let currentLvlScore = 1000;
         let selectedPieceIdx = null;
-        const piecePenalty = 200; // 4 pieces x 200 = 800 total penalty max (200 points guaranteed left)
+        const piecePenalty = 200; 
 
         function checkPassword() {
             if (document.getElementById("pass-input").value === SECRET_PASSWORD) {
@@ -160,7 +159,7 @@
             for(let i=0; i<4; i++) {
                 const el = document.createElement("div");
                 el.className = `piece p${i}`;
-                el.innerText = i + 1; // Shows piece number 1-4
+                el.innerText = i + 1; 
                 el.onclick = () => triggerQuestion(i);
                 box.appendChild(el);
             }
