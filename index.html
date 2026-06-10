@@ -467,6 +467,19 @@
                     "Is the heart a bone?"
                 ],
                 keys: [true, true, true, true, false, false]
+            },
+            {
+                image: "./images/quizze_3.jpeg",
+                answer: ["nose", "a nose"],
+                questions: [
+                    "Is 20 - 8 equal to 12?",
+                    "Is Africa a country?",
+                    "Do humans use the nose for smelling?",
+                    "Does a circle have corners?",
+                    "Is the Amazon River in South America?",
+                    "Do fish usually breathe with lungs?"
+                ],
+                keys: [true, false, true, false, true, false]
             }
         ];
 
@@ -629,8 +642,10 @@
             resultImage.src = levelData.image;
             resultImage.style.display = "block";
 
+            const fileExtension = levelData.image.split(".").pop();
+
             document.getElementById("result-buttons").innerHTML = `
-                <a class="button-link" href="${levelData.image}" download="quizze_level_${levelNumber}_photo">Save Photo</a>
+                <a class="button-link" href="${levelData.image}" download="quizze_level_${levelNumber}_photo.${fileExtension}">Save Photo</a>
                 <button onclick="retryCurrentLevel()" class="secondary-btn">Play Again</button>
                 <button onclick="nextLevel()">Next Level</button>
             `;
