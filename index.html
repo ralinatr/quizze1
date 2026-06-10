@@ -4,66 +4,261 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Private Puzzle Quiz - Level 1</title>
+
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-        body { background: #1a1a2e; color: #fff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; }
-        #auth-screen { text-align: center; margin-top: 50px; }
-        #game-content { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 450px; }
-        header { text-align: center; margin-bottom: 15px; width: 100%; }
-        h1 { font-size: 1.4rem; color: #00f2fe; margin-bottom: 5px; }
-        .stats { display: flex; justify-content: space-between; background: #162447; padding: 10px; border-radius: 8px; font-size: 0.9rem; }
-        .highlight { color: #4facfe; font-weight: bold; }
-        
-        #game-board { 
-            width: 100%; 
-            aspect-ratio: 1 / 1; 
-            position: relative; 
-            background-size: 100% 100%; 
-            background-position: center; 
-            border: 3px solid #00f2fe; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
         }
-        
-        .puzzle-container { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+
+        body {
+            background: #1a1a2e;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
         }
-        
-        .piece { 
+
+        #auth-screen {
+            text-align: center;
+            margin-top: 50px;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        #game-content {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            color: #00f2fe;
+            margin-bottom: 5px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background: #162447;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .highlight {
+            color: #4facfe;
+            font-weight: bold;
+        }
+
+        #game-board {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            position: relative;
+            background-size: 100% 100%;
+            background-position: center;
+            border: 3px solid #00f2fe;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .puzzle-container {
             position: absolute;
-            background: #0f3460; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 1.5rem; 
-            color: #e94560; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .piece {
+            position: absolute;
+            background: #0f3460;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #e94560;
             transition: all 0.4s ease;
         }
-        
-        .piece:hover { background: #162447; filter: brightness(1.2); }
-        .piece.hidden { opacity: 0; pointer-events: none; transform: scale(0.9); }
 
-        /* Фигурные маски для сетки 2х2 */
-        .p0 { left: 0%; top: 0%; width: 56%; height: 56%; clip-path: polygon(0% 0%, 100% 0%, 100% 35%, 85% 35%, 85% 65%, 100% 65%, 100% 100%, 65% 100%, 65% 85%, 35% 85%, 35% 100%, 0% 100%); }
-        .p1 { left: 50%; top: 0%; width: 50%; height: 56%; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 65%, 15% 65%, 15% 35%, 0% 35%); }
-        .p2 { left: 0%; top: 50%; width: 56%; height: 50%; clip-path: polygon(0% 0%, 65% 0%, 65% 15%, 35% 15%, 35% 0%, 100% 0%, 100% 100%, 0% 100%); }
-        .p3 { left: 50%; top: 50%; width: 50%; height: 50%; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); }
+        .piece:hover {
+            background: #162447;
+            filter: brightness(1.2);
+        }
 
-        .input-panel { width: 100%; margin-top: 15px; display: flex; gap: 10px; }
-        input { flex: 1; padding: 12px; border: none; border-radius: 8px; background: #162447; color: #fff; font-size: 1rem; outline: none; border: 1px solid #4facfe; }
-        button { padding: 12px 20px; border: none; border-radius: 8px; background: linear-gradient(45deg, #00f2fe, #4facfe); color: #1a1a2e; font-weight: bold; font-size: 1rem; cursor: pointer; }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 10; padding: 20px; }
-        .modal-content { background: #162447; padding: 25px; border-radius: 12px; text-align: center; max-width: 350px; width: 100%; border: 2px solid #00f2fe; }
-        .modal p { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.5; }
-        .modal-buttons { display: flex; gap: 10px; justify-content: center; }
-        .btn-ans { padding: 10px 25px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .btn-yes { background: #4e9f3d; color: #fff; }
-        .btn-no { background: #d83a56; color: #fff; }
+        .piece.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.9);
+        }
+
+        .p0 {
+            left: 0%;
+            top: 0%;
+            width: 56%;
+            height: 56%;
+            clip-path: polygon(
+                0% 0%, 100% 0%, 100% 35%, 85% 35%, 85% 65%,
+                100% 65%, 100% 100%, 65% 100%, 65% 85%,
+                35% 85%, 35% 100%, 0% 100%
+            );
+        }
+
+        .p1 {
+            left: 50%;
+            top: 0%;
+            width: 50%;
+            height: 56%;
+            clip-path: polygon(
+                0% 0%, 100% 0%, 100% 100%, 0% 100%,
+                0% 65%, 15% 65%, 15% 35%, 0% 35%
+            );
+        }
+
+        .p2 {
+            left: 0%;
+            top: 50%;
+            width: 56%;
+            height: 50%;
+            clip-path: polygon(
+                0% 0%, 65% 0%, 65% 15%, 35% 15%,
+                35% 0%, 100% 0%, 100% 100%, 0% 100%
+            );
+        }
+
+        .p3 {
+            left: 50%;
+            top: 50%;
+            width: 50%;
+            height: 50%;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+        }
+
+        .input-panel {
+            width: 100%;
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #162447;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            border: 1px solid #4facfe;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #00f2fe, #4facfe);
+            color: #1a1a2e;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        button:hover {
+            filter: brightness(1.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #162447;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 350px;
+            width: 100%;
+            border: 2px solid #00f2fe;
+        }
+
+        .modal p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-ans {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-yes {
+            background: #4e9f3d;
+            color: #fff;
+        }
+
+        .btn-no {
+            background: #d83a56;
+            color: #fff;
+        }
+
+        .completion-card {
+            text-align: center;
+            margin-top: 60px;
+            background: #162447;
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid #00f2fe;
+            width: 100%;
+        }
+
+        .completion-card p {
+            margin-top: 12px;
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+
+        .completion-muted {
+            color: #aaa;
+        }
     </style>
 </head>
+
 <body>
 
     <!-- AUTHENTICATION SCREEN -->
@@ -87,7 +282,7 @@
 
         <div id="game-board">
             <div class="puzzle-container" id="puzzle-box">
-                <!-- 4 pieces generated here -->
+                <!-- Puzzle pieces are generated by JavaScript -->
             </div>
         </div>
 
@@ -109,21 +304,19 @@
     </div>
 
     <script>
-        const SECRET_PASSWORD = "hoshi2026"; 
+        const SECRET_PASSWORD = "hoshi2026";
 
-        // LEVEL 1: YOUR PHOTO AND 9-10 GRADE RUSSIAN SCHOOL MATH QUESTIONS (IN ENGLISH)
         const gameLevels = [
             {
-                // Ссылка преобразована для прямого скачивания изображения из вашего Google Диска
-                image: "https://drive.google.com/uc?export=download&id=1WDVHSfE_QP0Y2kzrg-J1VBNSWDOQdtjZ", 
-                answer: "lips", 
+                image: "./images/quizze_1.jpeg",
+                answer: ["lips", "mouth"],
                 questions: [
-                    "If the discriminant of a quadratic equation is greater than zero (D > 0), does it have two distinct real roots?", // Piece 1 (Yes)
-                    "Is any number to the power of zero equal to zero (x^0 = 0)?",                                               // Piece 2 (No, it is 1)
-                    "If a parabola equation is y = -x^2 + 4, do its branches point upwards?",                                    // Piece 3 (No, they point downwards)
-                    "Is the value of sin(30°) equal to 0.5?"                                                                     // Piece 4 (Yes)
+                    "Is 8 + 4 equal to 12?",
+                    "Is 6 × 7 equal to 48?",
+                    "Does a rectangle have four sides?",
+                    "Is 15 divided by 3 equal to 6?"
                 ],
-                keys: [true, false, false, true] // Correct answers: Yes, No, No, Yes
+                keys: [true, false, true, false]
             }
         ];
 
@@ -131,10 +324,13 @@
         let totalScore = 0;
         let currentLvlScore = 1000;
         let selectedPieceIdx = null;
-        const piecePenalty = 200; 
+
+        const piecePenalty = 200;
 
         function checkPassword() {
-            if (document.getElementById("pass-input").value === SECRET_PASSWORD) {
+            const password = document.getElementById("pass-input").value;
+
+            if (password === SECRET_PASSWORD) {
                 document.getElementById("auth-screen").style.display = "none";
                 document.getElementById("game-content").style.display = "flex";
                 initGame();
@@ -145,24 +341,29 @@
 
         function initGame() {
             if (currentLevel >= gameLevels.length) {
-                alert(`Congratulations! You completed Level 1! Total Score: ${totalScore}`);
+                showCompletionScreen();
                 return;
             }
+
             const levelData = gameLevels[currentLevel];
+
             document.getElementById("lvl").innerText = currentLevel + 1;
             document.getElementById("game-board").style.backgroundImage = `url('${levelData.image}')`;
+
             currentLvlScore = 1000;
             updateUI();
-            
+
             const box = document.getElementById("puzzle-box");
             box.innerHTML = "";
-            for(let i=0; i<4; i++) {
+
+            for (let i = 0; i < 4; i++) {
                 const el = document.createElement("div");
                 el.className = `piece p${i}`;
-                el.innerText = i + 1; 
+                el.innerText = i + 1;
                 el.onclick = () => triggerQuestion(i);
                 box.appendChild(el);
             }
+
             document.getElementById("user-guess").value = "";
         }
 
@@ -173,17 +374,25 @@
 
         function triggerQuestion(index) {
             selectedPieceIdx = index;
+
             document.getElementById("modal-text").innerText = gameLevels[currentLevel].questions[index];
             document.getElementById("quiz-modal").style.display = "flex";
         }
 
         function submitQuestionAnswer(userChoice) {
             document.getElementById("quiz-modal").style.display = "none";
+
+            const piece = document.querySelector(`.p${selectedPieceIdx}`);
+
+            if (!piece || piece.classList.contains("hidden")) {
+                return;
+            }
+
             const currentLevelData = gameLevels[currentLevel];
+
             if (userChoice === currentLevelData.keys[selectedPieceIdx]) {
-                document.querySelector(`.p${selectedPieceIdx}`).classList.add('hidden');
-                currentLvlScore -= piecePenalty;
-                if (currentLvlScore < 0) currentLvlScore = 0;
+                piece.classList.add("hidden");
+                currentLvlScore = Math.max(0, currentLvlScore - piecePenalty);
                 updateUI();
             } else {
                 alert("Wrong answer! The puzzle piece stays closed.");
@@ -191,17 +400,53 @@
         }
 
         function makeGuess() {
-            if (document.getElementById("user-guess").value.trim().toLowerCase() === gameLevels[currentLevel].answer) {
+            if (currentLevel >= gameLevels.length) {
+                return;
+            }
+
+            const guess = document.getElementById("user-guess").value.trim().toLowerCase();
+            const correctAnswers = gameLevels[currentLevel].answer;
+
+            if (correctAnswers.includes(guess)) {
                 alert(`Correct! You earned ${currentLvlScore} points.`);
+
                 totalScore += currentLvlScore;
                 currentLevel++;
+
                 initGame();
             } else {
                 alert("Incorrect guess! -100 points.");
+
                 currentLvlScore = Math.max(0, currentLvlScore - 100);
                 updateUI();
             }
         }
+
+        function showCompletionScreen() {
+            document.getElementById("game-content").innerHTML = `
+                <div class="completion-card">
+                    <h1>Congratulations!</h1>
+                    <p>You completed Level 1.</p>
+                    <p class="completion-muted">The next part of the game is coming soon.</p>
+                    <p>Total score: <span class="highlight">${totalScore}</span></p>
+                </div>
+            `;
+
+            document.getElementById("game-content").style.display = "flex";
+        }
+
+        document.getElementById("pass-input").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                checkPassword();
+            }
+        });
+
+        document.getElementById("user-guess").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                makeGuess();
+            }
+        });
     </script>
+
 </body>
-</html> 
+</html>
