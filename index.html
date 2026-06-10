@@ -27,7 +27,7 @@
             text-align: center;
             margin-top: 50px;
             width: 100%;
-            max-width: 350px;
+            max-width: 360px;
         }
 
         #game-content {
@@ -35,7 +35,7 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
-            max-width: 450px;
+            max-width: 460px;
         }
 
         header {
@@ -82,8 +82,8 @@
             inset: 0;
             background-size: cover;
             background-position: center;
-            filter: blur(5px) brightness(0.92);
-            transform: scale(1.04);
+            filter: blur(12px) brightness(0.88) saturate(0.95);
+            transform: scale(1.06);
             transition: filter 0.35s ease;
         }
 
@@ -95,25 +95,76 @@
         .piece {
             position: absolute;
             background: linear-gradient(145deg, #16315f, #0f2346);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255,255,255,0.08);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.25rem;
-            color: #9ecbff;
+            color: #a6d3ff;
             font-weight: bold;
+            font-size: 1.15rem;
             transition: opacity 0.35s ease, transform 0.35s ease, background 0.25s ease;
+            backdrop-filter: blur(2px);
         }
 
         .piece:hover {
-            background: linear-gradient(145deg, #1b3d74, #13305d);
+            background: linear-gradient(145deg, #1d427a, #153565);
         }
 
         .piece.hidden {
             opacity: 0;
             pointer-events: none;
             transform: scale(0.96);
+        }
+
+        /* Top row */
+        .p0 {
+            left: -1%;
+            top: -1%;
+            width: 35%;
+            height: 53%;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 20%, 86% 28%, 100% 44%, 100% 100%, 76% 100%, 64% 88%, 48% 100%, 0% 100%, 0% 0%);
+        }
+
+        .p1 {
+            left: 32.5%;
+            top: -1%;
+            width: 35%;
+            height: 53%;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 72% 100%, 58% 86%, 40% 100%, 0% 100%, 0% 46%, 14% 35%, 0% 18%);
+        }
+
+        .p2 {
+            left: 65%;
+            top: -1%;
+            width: 36%;
+            height: 53%;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 42%, 12% 28%, 0% 15%);
+        }
+
+        /* Bottom row */
+        .p3 {
+            left: -1%;
+            top: 48%;
+            width: 35%;
+            height: 53%;
+            clip-path: polygon(0% 0%, 46% 0%, 60% 12%, 78% 0%, 100% 0%, 100% 100%, 0% 100%);
+        }
+
+        .p4 {
+            left: 32.5%;
+            top: 48%;
+            width: 35%;
+            height: 53%;
+            clip-path: polygon(0% 0%, 34% 0%, 50% 14%, 66% 0%, 100% 0%, 100% 100%, 0% 100%);
+        }
+
+        .p5 {
+            left: 65%;
+            top: 48%;
+            width: 36%;
+            height: 53%;
+            clip-path: polygon(0% 0%, 26% 0%, 40% 12%, 58% 0%, 100% 0%, 100% 100%, 0% 100%);
         }
 
         .input-panel {
@@ -135,8 +186,9 @@
             border: 1px solid #4facfe;
         }
 
-        button {
-            padding: 12px 20px;
+        button,
+        .button-link {
+            padding: 12px 18px;
             border: none;
             border-radius: 8px;
             background: linear-gradient(45deg, #00f2fe, #4facfe);
@@ -144,9 +196,14 @@
             font-weight: bold;
             font-size: 1rem;
             cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        button:hover {
+        button:hover,
+        .button-link:hover {
             filter: brightness(1.08);
         }
 
@@ -156,19 +213,19 @@
             inset: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.86);
             align-items: center;
             justify-content: center;
-            z-index: 10;
+            z-index: 20;
             padding: 20px;
         }
 
         .modal-content {
             background: #162447;
-            padding: 25px;
+            padding: 24px;
             border-radius: 12px;
             text-align: center;
-            max-width: 360px;
+            max-width: 380px;
             width: 100%;
             border: 2px solid #00f2fe;
         }
@@ -183,10 +240,11 @@
             display: flex;
             gap: 10px;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
         .btn-ans {
-            padding: 10px 25px;
+            padding: 10px 24px;
             border: none;
             border-radius: 6px;
             font-weight: bold;
@@ -203,24 +261,45 @@
             color: #fff;
         }
 
-        .completion-card {
-            text-align: center;
-            margin-top: 60px;
-            background: #162447;
-            padding: 30px;
-            border-radius: 12px;
-            border: 2px solid #00f2fe;
-            width: 100%;
+        .result-title {
+            color: #00f2fe;
+            margin-bottom: 12px;
+            font-size: 1.5rem;
         }
 
-        .completion-card p {
-            margin-top: 12px;
-            font-size: 1.05rem;
+        .result-text {
+            margin-bottom: 14px;
             line-height: 1.5;
         }
 
-        .completion-muted {
-            color: #aaa;
+        .result-score {
+            margin-top: 10px;
+            margin-bottom: 14px;
+            color: #a6d3ff;
+            font-weight: bold;
+        }
+
+        .result-image {
+            width: 100%;
+            max-width: 280px;
+            border-radius: 10px;
+            margin: 12px auto 16px;
+            display: block;
+            border: 2px solid rgba(255,255,255,0.12);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+        }
+
+        .result-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .secondary-btn {
+            background: #2b4472;
+            color: #fff;
         }
 
         @media (max-width: 480px) {
@@ -240,7 +319,7 @@
 </head>
 <body>
 
-    <!-- AUTHENTICATION SCREEN -->
+    <!-- AUTH SCREEN -->
     <div id="auth-screen">
         <h2>Access Restricted</h2>
         <p style="margin: 15px 0; color: #aaa;">Enter password to start the game:</p>
@@ -248,7 +327,7 @@
         <button onclick="checkPassword()" style="margin-top: 10px; width: 100%;">Login</button>
     </div>
 
-    <!-- MAIN GAME SCREEN -->
+    <!-- GAME -->
     <div id="game-content">
         <header>
             <h1>Guess the Object!</h1>
@@ -281,6 +360,17 @@
         </div>
     </div>
 
+    <!-- RESULT MODAL -->
+    <div class="modal" id="result-modal">
+        <div class="modal-content">
+            <h2 class="result-title" id="result-title">Result</h2>
+            <p class="result-text" id="result-text"></p>
+            <img id="result-image" class="result-image" src="" alt="Result image" style="display: none;">
+            <div class="result-score" id="result-score"></div>
+            <div class="result-buttons" id="result-buttons"></div>
+        </div>
+    </div>
+
     <script>
         const SECRET_PASSWORD = "hoshi2026";
 
@@ -289,14 +379,14 @@
                 image: "./images/quizze_1.jpeg",
                 answer: ["lips", "mouth"],
                 questions: [
-                    "Is 8 + 4 equal to 12?",
-                    "Is 7 - 2 equal to 6?",
-                    "Does a triangle have 3 sides?",
-                    "Is 5 × 3 equal to 15?",
-                    "Is 18 divided by 3 equal to 5?",
-                    "Is 10 greater than 7?"
+                    "Is 9 + 6 equal to 15?",                               // Math
+                    "Is the Nile a sea?",                                  // Geography
+                    "Do plants make oxygen during photosynthesis?",        // Biology
+                    "Does a triangle have four angles?",                   // Geometry
+                    "Is Earth the third planet from the Sun?",             // Geography
+                    "Does a rectangle always have four equal sides?"       // Geometry
                 ],
-                keys: [true, false, true, true, false, true]
+                keys: [true, false, true, false, true, false]
             }
         ];
 
@@ -305,11 +395,15 @@
         let currentLvlScore = 1000;
         let selectedPieceIdx = null;
         let openedPieces = 0;
+        let gameLocked = false;
+        let levelCompleted = false;
+        let levelStartTotalScore = 0;
 
-        const piecePenalty = 150;
-        const initialBlur = 5;
-        const minBlur = 1.2;
-        const blurStep = 0.7;
+        const piecePenalty = 120;
+        const wrongGuessPenalty = 100;
+        const initialBlur = 14;
+        const minBlur = 4;
+        const blurStep = 1.5;
 
         function checkPassword() {
             const password = document.getElementById("pass-input").value;
@@ -325,46 +419,35 @@
 
         function initGame() {
             if (currentLevel >= gameLevels.length) {
-                showCompletionScreen();
-                return;
+                currentLevel = 0;
             }
 
             const levelData = gameLevels[currentLevel];
 
+            levelStartTotalScore = totalScore;
+            currentLvlScore = 1000;
+            selectedPieceIdx = null;
+            openedPieces = 0;
+            gameLocked = false;
+            levelCompleted = false;
+
             document.getElementById("lvl").innerText = currentLevel + 1;
             document.getElementById("user-guess").value = "";
-            currentLvlScore = 1000;
-            openedPieces = 0;
-
-            const gameImage = document.getElementById("game-image");
-            gameImage.style.backgroundImage = `url('${levelData.image}')`;
+            document.getElementById("game-image").style.backgroundImage = `url('${levelData.image}')`;
 
             updateUI();
             updateImageBlur();
+            hideResultModal();
 
             const box = document.getElementById("puzzle-box");
             box.innerHTML = "";
 
-            const totalPieces = levelData.questions.length;
-            const columns = 3;
-            const rows = 2;
-            const pieceWidth = 100 / columns;
-            const pieceHeight = 100 / rows;
-
-            for (let i = 0; i < totalPieces; i++) {
+            for (let i = 0; i < 6; i++) {
                 const el = document.createElement("div");
-                const col = i % columns;
-                const row = Math.floor(i / columns);
-
-                el.className = "piece";
+                el.className = `piece p${i}`;
                 el.innerText = i + 1;
-                el.style.left = `${col * pieceWidth}%`;
-                el.style.top = `${row * pieceHeight}%`;
-                el.style.width = `${pieceWidth}%`;
-                el.style.height = `${pieceHeight}%`;
                 el.dataset.index = i;
                 el.onclick = () => triggerQuestion(i);
-
                 box.appendChild(el);
             }
         }
@@ -375,11 +458,17 @@
         }
 
         function updateImageBlur() {
-            const blurValue = Math.max(minBlur, initialBlur - openedPieces * blurStep);
-            document.getElementById("game-image").style.filter = `blur(${blurValue}px) brightness(0.92)`;
+            const blurValue = Math.max(minBlur, initialBlur - (openedPieces * blurStep));
+            document.getElementById("game-image").style.filter =
+                `blur(${blurValue}px) brightness(0.88) saturate(0.95)`;
         }
 
         function triggerQuestion(index) {
+            if (gameLocked) return;
+
+            const piece = document.querySelector(`.piece[data-index="${index}"]`);
+            if (!piece || piece.classList.contains("hidden")) return;
+
             selectedPieceIdx = index;
             document.getElementById("modal-text").innerText = gameLevels[currentLevel].questions[index];
             document.getElementById("quiz-modal").style.display = "flex";
@@ -388,53 +477,122 @@
         function submitQuestionAnswer(userChoice) {
             document.getElementById("quiz-modal").style.display = "none";
 
-            const piece = document.querySelector(`.piece[data-index="${selectedPieceIdx}"]`);
+            if (gameLocked || selectedPieceIdx === null) return;
 
-            if (!piece || piece.classList.contains("hidden")) {
-                return;
-            }
+            const piece = document.querySelector(`.piece[data-index="${selectedPieceIdx}"]`);
+            if (!piece || piece.classList.contains("hidden")) return;
 
             const currentLevelData = gameLevels[currentLevel];
 
             if (userChoice === currentLevelData.keys[selectedPieceIdx]) {
                 piece.classList.add("hidden");
-                currentLvlScore = Math.max(0, currentLvlScore - piecePenalty);
                 openedPieces++;
+                currentLvlScore = Math.max(0, currentLvlScore - piecePenalty);
                 updateImageBlur();
                 updateUI();
+
+                if (currentLvlScore <= 0) {
+                    showLoseModal();
+                }
             } else {
                 alert("Wrong answer! The puzzle piece stays closed.");
             }
+
+            selectedPieceIdx = null;
         }
 
         function makeGuess() {
-            if (currentLevel >= gameLevels.length) return;
+            if (gameLocked) return;
 
             const guess = document.getElementById("user-guess").value.trim().toLowerCase();
             const correctAnswers = gameLevels[currentLevel].answer;
 
+            if (!guess) return;
+
             if (correctAnswers.includes(guess)) {
-                alert(`Correct! You earned ${currentLvlScore} points.`);
+                gameLocked = true;
+                levelCompleted = true;
                 totalScore += currentLvlScore;
-                currentLevel++;
-                initGame();
-            } else {
-                alert("Incorrect guess! -100 points.");
-                currentLvlScore = Math.max(0, currentLvlScore - 100);
                 updateUI();
+                showWinModal();
+            } else {
+                currentLvlScore = Math.max(0, currentLvlScore - wrongGuessPenalty);
+                updateUI();
+
+                if (currentLvlScore <= 0) {
+                    showLoseModal();
+                } else {
+                    alert("Incorrect guess! -100 points.");
+                }
             }
         }
 
-        function showCompletionScreen() {
-            document.getElementById("game-content").innerHTML = `
-                <div class="completion-card">
-                    <h1>Congratulations!</h1>
-                    <p>You completed Level 1.</p>
-                    <p class="completion-muted">The next part of the game is coming soon.</p>
-                    <p>Total score: <span class="highlight">${totalScore}</span></p>
-                </div>
+        function showWinModal() {
+            const levelData = gameLevels[currentLevel];
+
+            document.getElementById("result-title").innerText = "Congratulations!";
+            document.getElementById("result-text").innerText =
+                "You guessed the object correctly and completed Level 1.";
+            document.getElementById("result-score").innerText =
+                `Level score: ${currentLvlScore} | Total score: ${totalScore}`;
+
+            const resultImage = document.getElementById("result-image");
+            resultImage.src = levelData.image;
+            resultImage.style.display = "block";
+
+            document.getElementById("result-buttons").innerHTML = `
+                <a class="button-link" href="${levelData.image}" download="quizze_level_1_photo.jpeg">Save Photo</a>
+                <button onclick="retryCurrentLevel()" class="secondary-btn">Play Again</button>
+                <button onclick="nextLevel()">Next Level</button>
             `;
-            document.getElementById("game-content").style.display = "flex";
+
+            document.getElementById("result-modal").style.display = "flex";
+        }
+
+        function showLoseModal() {
+            gameLocked = true;
+            levelCompleted = false;
+
+            document.getElementById("result-title").innerText = "Level failed";
+            document.getElementById("result-text").innerText =
+                "You ran out of points. You can try the level again from the beginning.";
+            document.getElementById("result-score").innerText =
+                `Level score: 0 | Total score: ${totalScore}`;
+
+            const resultImage = document.getElementById("result-image");
+            resultImage.src = "";
+            resultImage.style.display = "none";
+
+            document.getElementById("result-buttons").innerHTML = `
+                <button onclick="retryCurrentLevel()">Try Again</button>
+            `;
+
+            document.getElementById("result-modal").style.display = "flex";
+        }
+
+        function hideResultModal() {
+            document.getElementById("result-modal").style.display = "none";
+        }
+
+        function retryCurrentLevel() {
+            hideResultModal();
+
+            // rollback score of the current level if it had already been added after victory
+            totalScore = levelStartTotalScore;
+            updateUI();
+
+            initGame();
+        }
+
+        function nextLevel() {
+            hideResultModal();
+
+            if (currentLevel < gameLevels.length - 1) {
+                currentLevel++;
+                initGame();
+            } else {
+                alert("The next level is coming soon!");
+            }
         }
 
         document.getElementById("pass-input").addEventListener("keydown", function(event) {
@@ -449,5 +607,6 @@
             }
         });
     </script>
+
 </body>
-</html> 
+</html>
