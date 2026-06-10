@@ -3,26 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Private Quiz Game</title>
+    <title>Private Puzzle Quiz - Level 1</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
         body { background: #1a1a2e; color: #fff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; }
         #auth-screen { text-align: center; margin-top: 50px; }
-        #game-content { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 400px; }
+        #game-content { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 450px; }
         header { text-align: center; margin-bottom: 15px; width: 100%; }
         h1 { font-size: 1.4rem; color: #00f2fe; margin-bottom: 5px; }
         .stats { display: flex; justify-content: space-between; background: #162447; padding: 10px; border-radius: 8px; font-size: 0.9rem; }
         .highlight { color: #4facfe; font-weight: bold; }
-        #game-board { width: 100%; aspect-ratio: 1 / 1; position: relative; background-size: cover; background-position: center; border: 3px solid #00f2fe; border-radius: 12px; overflow: hidden; }
-        .grid-mask { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .piece { background: #0f3460; border: 2px solid #1a1a2e; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #e94560; transition: all 0.4s ease; }
+        
+        /* Квадратное игровое поле для сетки 2х2 */
+        #game-board { 
+            width: 100%; 
+            aspect-ratio: 1 / 1; 
+            position: relative; 
+            background-size: 100% 100%; 
+            background-position: center; 
+            border: 3px solid #00f2fe; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+        
+        .puzzle-container { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+        }
+        
+        /* Стилизация 4 фигурных кусочков пазла */
+        .piece { 
+            position: absolute;
+            background: #0f3460; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.5rem; 
+            color: #e94560; 
+            transition: all 0.4s ease;
+        }
+        
+        .piece:hover { background: #162447; filter: brightness(1.2); }
         .piece.hidden { opacity: 0; pointer-events: none; transform: scale(0.9); }
+
+        /* Фигурные маски для сетки 2х2 (настоящие замковые края) */
+        .p0 { left: 0%; top: 0%; width: 56%; height: 56%; clip-path: polygon(0% 0%, 100% 0%, 100% 35%, 85% 35%, 85% 65%, 100% 65%, 100% 100%, 65% 100%, 65% 85%, 35% 85%, 35% 100%, 0% 100%); }
+        .p1 { left: 50%; top: 0%; width: 50%; height: 56%; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 65%, 15% 65%, 15% 35%, 0% 35%); }
+        .p2 { left: 0%; top: 50%; width: 56%; height: 50%; clip-path: polygon(0% 0%, 65% 0%, 65% 15%, 35% 15%, 35% 0%, 100% 0%, 100% 100%, 0% 100%); }
+        .p3 { left: 50%; top: 50%; width: 50%; height: 50%; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); }
+
         .input-panel { width: 100%; margin-top: 15px; display: flex; gap: 10px; }
         input { flex: 1; padding: 12px; border: none; border-radius: 8px; background: #162447; color: #fff; font-size: 1rem; outline: none; border: 1px solid #4facfe; }
         button { padding: 12px 20px; border: none; border-radius: 8px; background: linear-gradient(45deg, #00f2fe, #4facfe); color: #1a1a2e; font-weight: bold; font-size: 1rem; cursor: pointer; }
+        
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 10; padding: 20px; }
         .modal-content { background: #162447; padding: 25px; border-radius: 12px; text-align: center; max-width: 350px; width: 100%; border: 2px solid #00f2fe; }
-        .modal p { font-size: 1.1rem; margin-bottom: 20px; }
+        .modal p { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.5; }
         .modal-buttons { display: flex; gap: 10px; justify-content: center; }
         .btn-ans { padding: 10px 25px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-yes { background: #4e9f3d; color: #fff; }
@@ -51,11 +88,8 @@
         </header>
 
         <div id="game-board">
-            <div class="grid-mask">
-                <div class="piece" onclick="triggerQuestion(0)">?</div>
-                <div class="piece" onclick="triggerQuestion(1)">?</div>
-                <div class="piece" onclick="triggerQuestion(2)">?</div>
-                <div class="piece" onclick="triggerQuestion(3)">?</div>
+            <div class="puzzle-container" id="puzzle-box">
+                <!-- 4 pieces generated here -->
             </div>
         </div>
 
@@ -77,37 +111,31 @@
     </div>
 
     <script>
-        // UPDATED PASSWORD
         const SECRET_PASSWORD = "hoshi2026"; 
 
-        // LEVEL DATABASE
+        // LEVEL 1: 4 PIECES WITH HIGH SCHOOL MATH QUESTIONS
         const gameLevels = [
             {
-                image: "https://unsplash.com", // Cat
-                answer: "cat",
-                questions: ["Is it a domestic pet?", "Can it bark?", "Does it catch mice?", "Does it have wings?"]
-            },
-            {
-                image: "https://unsplash.com", // Fox
-                answer: "fox",
-                questions: ["Is it a wild animal?", "Does it live in the ocean?", "Is it orange/red?", "Is it a bird?"]
+                image: "https://unsplash.com", // Lips photo
+                answer: "lips", 
+                questions: [
+                    "Is the derivative of sin(x) equal to cos(x)?",                // Piece 1 (Yes)
+                    "Is log(1) equal to 1?",                                        // Piece 2 (No, it's 0)
+                    "Does a quadratic equation with a negative discriminant (D < 0) have real roots?", // Piece 3 (No, complex roots)
+                    "Is the value of cos(π) equal to -1?"                           // Piece 4 (Yes)
+                ],
+                keys: [true, false, false, true] // Correct answers: Yes, No, No, Yes
             }
-        ];
-
-        // Correct answers for the questions (True/False)
-        const questionKeys = [
-            [true, false, true, false], // Level 1 (Cat)
-            [true, false, true, false]  // Level 2 (Fox)
         ];
 
         let currentLevel = 0;
         let totalScore = 0;
         let currentLvlScore = 1000;
         let selectedPieceIdx = null;
+        const piecePenalty = 200; // 4 pieces x 200 = 800 total penalty max (200 points guaranteed left)
 
         function checkPassword() {
-            const entered = document.getElementById("pass-input").value;
-            if (entered === SECRET_PASSWORD) {
+            if (document.getElementById("pass-input").value === SECRET_PASSWORD) {
                 document.getElementById("auth-screen").style.display = "none";
                 document.getElementById("game-content").style.display = "flex";
                 initGame();
@@ -118,7 +146,7 @@
 
         function initGame() {
             if (currentLevel >= gameLevels.length) {
-                alert(`Congratulations! Game completed. Final Score: ${totalScore}`);
+                alert(`Congratulations! You completed Level 1! Total Score: ${totalScore}`);
                 return;
             }
             const levelData = gameLevels[currentLevel];
@@ -126,7 +154,16 @@
             document.getElementById("game-board").style.backgroundImage = `url('${levelData.image}')`;
             currentLvlScore = 1000;
             updateUI();
-            document.querySelectorAll('.piece').forEach(p => p.classList.remove('hidden'));
+            
+            const box = document.getElementById("puzzle-box");
+            box.innerHTML = "";
+            for(let i=0; i<4; i++) {
+                const el = document.createElement("div");
+                el.className = `piece p${i}`;
+                el.innerText = i + 1; // Shows piece number 1-4
+                el.onclick = () => triggerQuestion(i);
+                box.appendChild(el);
+            }
             document.getElementById("user-guess").value = "";
         }
 
@@ -143,19 +180,20 @@
 
         function submitQuestionAnswer(userChoice) {
             document.getElementById("quiz-modal").style.display = "none";
-            if (userChoice === questionKeys[currentLevel][selectedPieceIdx]) {
-                document.querySelectorAll('.piece')[selectedPieceIdx].classList.add('hidden');
-                currentLvlScore -= 150;
+            const currentLevelData = gameLevels[currentLevel];
+            if (userChoice === currentLevelData.keys[selectedPieceIdx]) {
+                document.querySelector(`.p${selectedPieceIdx}`).classList.add('hidden');
+                currentLvlScore -= piecePenalty;
                 if (currentLvlScore < 0) currentLvlScore = 0;
                 updateUI();
             } else {
-                alert("Wrong answer! The piece stays closed.");
+                alert("Wrong answer! The puzzle piece stays closed.");
             }
         }
 
         function makeGuess() {
             if (document.getElementById("user-guess").value.trim().toLowerCase() === gameLevels[currentLevel].answer) {
-                alert(`Correct! +${currentLvlScore} points.`);
+                alert(`Correct! You earned ${currentLvlScore} points.`);
                 totalScore += currentLvlScore;
                 currentLevel++;
                 initGame();
