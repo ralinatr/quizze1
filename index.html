@@ -487,7 +487,7 @@
                 questions: [
                     "Is 14 + 5 equal to 19?",
                     "Is Australia both a country and a continent?",
-                    "Do people usually use fingers to touch and hold things?",
+                    "Is 7 × 8 equal to 56?",
                     "Does a cube have six faces?",
                     "Is the Sahara Desert in Europe?",
                     "Do mammals usually feed their babies with milk?"
@@ -496,11 +496,11 @@
             },
             {
                 image: "./images/quizze_5.jpeg",
-                answer: ["thigh", "a thigh"],
+                answer: ["hip", "a hip"],
                 questions: [
                     "Is 16 divided by 4 equal to 4?",
                     "Is Tokyo the capital of Japan?",
-                    "Is the thigh a part of the leg?",
+                    "Does a hexagon have six sides?",
                     "Does a pentagon have five sides?",
                     "Is Antarctica the hottest continent?",
                     "Do humans need oxygen to breathe?"
@@ -580,6 +580,14 @@
                 `blur(${blurValue}px) brightness(0.82) saturate(0.92)`;
         }
 
+        function normalizeAnswer(value) {
+            return value
+                .trim()
+                .toLowerCase()
+                .replace(/^a\s+/, "")
+                .replace(/[^a-z]/g, "");
+        }
+
         function triggerQuestion(index) {
             if (gameLocked) return;
 
@@ -629,13 +637,13 @@
         function makeGuess() {
             if (gameLocked) return;
 
-            const guess = document.getElementById("user-guess").value.trim().toLowerCase();
+            const guess = normalizeAnswer(document.getElementById("user-guess").value);
 
             if (!guess) {
                 return;
             }
 
-            const correctAnswers = gameLevels[currentLevel].answer;
+            const correctAnswers = gameLevels[currentLevel].answer.map(normalizeAnswer);
 
             if (correctAnswers.includes(guess)) {
                 gameLocked = true;
