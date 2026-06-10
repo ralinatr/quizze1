@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Private Puzzle Quiz - Level 1</title>
+    <title>Private Puzzle Quiz</title>
 
     <style>
         * {
@@ -82,8 +82,8 @@
             inset: 0;
             background-size: cover;
             background-position: center;
-            filter: blur(12px) brightness(0.88) saturate(0.95);
-            transform: scale(1.06);
+            filter: blur(18px) brightness(0.82) saturate(0.92);
+            transform: scale(1.08);
             transition: filter 0.35s ease;
         }
 
@@ -93,9 +93,12 @@
         }
 
         .piece {
+            --piece-bg: linear-gradient(145deg, #16315f, #0f2346);
+            --plug: clamp(20px, 8vw, 34px);
+
             position: absolute;
-            background: linear-gradient(145deg, #16315f, #0f2346);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: var(--piece-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -104,11 +107,23 @@
             font-weight: bold;
             font-size: 1.15rem;
             transition: opacity 0.35s ease, transform 0.35s ease, background 0.25s ease;
-            backdrop-filter: blur(2px);
+            box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.03);
+        }
+
+        .piece::before,
+        .piece::after {
+            content: "";
+            position: absolute;
+            width: var(--plug);
+            height: var(--plug);
+            border-radius: 50%;
+            background: var(--piece-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 2;
         }
 
         .piece:hover {
-            background: linear-gradient(145deg, #1d427a, #153565);
+            --piece-bg: linear-gradient(145deg, #1d427a, #153565);
         }
 
         .piece.hidden {
@@ -117,54 +132,108 @@
             transform: scale(0.96);
         }
 
-        /* Top row */
         .p0 {
-            left: -1%;
-            top: -1%;
-            width: 35%;
-            height: 53%;
-            clip-path: polygon(0% 0%, 100% 0%, 100% 20%, 86% 28%, 100% 44%, 100% 100%, 76% 100%, 64% 88%, 48% 100%, 0% 100%, 0% 0%);
+            left: 0%;
+            top: 0%;
+            width: 33.333%;
+            height: 50%;
+            border-radius: 10px 0 0 0;
+            z-index: 6;
+        }
+
+        .p0::before {
+            right: calc(var(--plug) / -2);
+            top: 36%;
+        }
+
+        .p0::after {
+            left: 38%;
+            bottom: calc(var(--plug) / -2);
         }
 
         .p1 {
-            left: 32.5%;
-            top: -1%;
-            width: 35%;
-            height: 53%;
-            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 72% 100%, 58% 86%, 40% 100%, 0% 100%, 0% 46%, 14% 35%, 0% 18%);
+            left: 33.333%;
+            top: 0%;
+            width: 33.333%;
+            height: 50%;
+            z-index: 5;
+        }
+
+        .p1::before {
+            right: calc(var(--plug) / -2);
+            top: 28%;
+        }
+
+        .p1::after {
+            left: 35%;
+            bottom: calc(var(--plug) / -2);
         }
 
         .p2 {
-            left: 65%;
-            top: -1%;
-            width: 36%;
-            height: 53%;
-            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 42%, 12% 28%, 0% 15%);
+            left: 66.666%;
+            top: 0%;
+            width: 33.334%;
+            height: 50%;
+            border-radius: 0 10px 0 0;
+            z-index: 4;
         }
 
-        /* Bottom row */
+        .p2::before {
+            display: none;
+        }
+
+        .p2::after {
+            left: 42%;
+            bottom: calc(var(--plug) / -2);
+        }
+
         .p3 {
-            left: -1%;
-            top: 48%;
-            width: 35%;
-            height: 53%;
-            clip-path: polygon(0% 0%, 46% 0%, 60% 12%, 78% 0%, 100% 0%, 100% 100%, 0% 100%);
+            left: 0%;
+            top: 50%;
+            width: 33.333%;
+            height: 50%;
+            border-radius: 0 0 0 10px;
+            z-index: 3;
+        }
+
+        .p3::before {
+            right: calc(var(--plug) / -2);
+            top: 42%;
+        }
+
+        .p3::after {
+            display: none;
         }
 
         .p4 {
-            left: 32.5%;
-            top: 48%;
-            width: 35%;
-            height: 53%;
-            clip-path: polygon(0% 0%, 34% 0%, 50% 14%, 66% 0%, 100% 0%, 100% 100%, 0% 100%);
+            left: 33.333%;
+            top: 50%;
+            width: 33.333%;
+            height: 50%;
+            z-index: 2;
+        }
+
+        .p4::before {
+            right: calc(var(--plug) / -2);
+            top: 34%;
+        }
+
+        .p4::after {
+            display: none;
         }
 
         .p5 {
-            left: 65%;
-            top: 48%;
-            width: 36%;
-            height: 53%;
-            clip-path: polygon(0% 0%, 26% 0%, 40% 12%, 58% 0%, 100% 0%, 100% 100%, 0% 100%);
+            left: 66.666%;
+            top: 50%;
+            width: 33.334%;
+            height: 50%;
+            border-radius: 0 0 10px 0;
+            z-index: 1;
+        }
+
+        .p5::before,
+        .p5::after {
+            display: none;
         }
 
         .input-panel {
@@ -285,8 +354,8 @@
             border-radius: 10px;
             margin: 12px auto 16px;
             display: block;
-            border: 2px solid rgba(255,255,255,0.12);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
         }
 
         .result-buttons {
@@ -311,15 +380,16 @@
                 flex-direction: column;
             }
 
-            button {
+            button,
+            .button-link {
                 width: 100%;
             }
         }
     </style>
 </head>
+
 <body>
 
-    <!-- AUTH SCREEN -->
     <div id="auth-screen">
         <h2>Access Restricted</h2>
         <p style="margin: 15px 0; color: #aaa;">Enter password to start the game:</p>
@@ -327,7 +397,6 @@
         <button onclick="checkPassword()" style="margin-top: 10px; width: 100%;">Login</button>
     </div>
 
-    <!-- GAME -->
     <div id="game-content">
         <header>
             <h1>Guess the Object!</h1>
@@ -349,7 +418,6 @@
         </div>
     </div>
 
-    <!-- QUESTION MODAL -->
     <div class="modal" id="quiz-modal">
         <div class="modal-content">
             <p id="modal-text">Question...</p>
@@ -360,7 +428,6 @@
         </div>
     </div>
 
-    <!-- RESULT MODAL -->
     <div class="modal" id="result-modal">
         <div class="modal-content">
             <h2 class="result-title" id="result-title">Result</h2>
@@ -379,14 +446,27 @@
                 image: "./images/quizze_1.jpeg",
                 answer: ["lips", "mouth"],
                 questions: [
-                    "Is 9 + 6 equal to 15?",                               // Math
-                    "Is the Nile a sea?",                                  // Geography
-                    "Do plants make oxygen during photosynthesis?",        // Biology
-                    "Does a triangle have four angles?",                   // Geometry
-                    "Is Earth the third planet from the Sun?",             // Geography
-                    "Does a rectangle always have four equal sides?"       // Geometry
+                    "Is 9 + 6 equal to 15?",
+                    "Is the Nile a sea?",
+                    "Do plants make oxygen during photosynthesis?",
+                    "Does a triangle have four angles?",
+                    "Is Earth the third planet from the Sun?",
+                    "Does a rectangle always have four equal sides?"
                 ],
                 keys: [true, false, true, false, true, false]
+            },
+            {
+                image: "./images/quizze_2.png",
+                answer: ["hand", "a hand"],
+                questions: [
+                    "Is 12 divided by 4 equal to 3?",
+                    "Is Paris the capital of France?",
+                    "Do humans usually have five fingers on one hand?",
+                    "Does a square have four equal sides?",
+                    "Is the Pacific Ocean smaller than the Black Sea?",
+                    "Is the heart a bone?"
+                ],
+                keys: [true, true, true, true, false, false]
             }
         ];
 
@@ -396,14 +476,14 @@
         let selectedPieceIdx = null;
         let openedPieces = 0;
         let gameLocked = false;
-        let levelCompleted = false;
         let levelStartTotalScore = 0;
 
         const piecePenalty = 120;
         const wrongGuessPenalty = 100;
-        const initialBlur = 14;
-        const minBlur = 4;
-        const blurStep = 1.5;
+
+        const initialBlur = 18;
+        const minBlur = 6;
+        const blurStep = 1.7;
 
         function checkPassword() {
             const password = document.getElementById("pass-input").value;
@@ -418,10 +498,6 @@
         }
 
         function initGame() {
-            if (currentLevel >= gameLevels.length) {
-                currentLevel = 0;
-            }
-
             const levelData = gameLevels[currentLevel];
 
             levelStartTotalScore = totalScore;
@@ -429,13 +505,15 @@
             selectedPieceIdx = null;
             openedPieces = 0;
             gameLocked = false;
-            levelCompleted = false;
 
             document.getElementById("lvl").innerText = currentLevel + 1;
+            document.getElementById("lvl-score").innerText = currentLvlScore;
+            document.getElementById("total-score").innerText = totalScore;
             document.getElementById("user-guess").value = "";
-            document.getElementById("game-image").style.backgroundImage = `url('${levelData.image}')`;
 
-            updateUI();
+            const gameImage = document.getElementById("game-image");
+            gameImage.style.backgroundImage = `url('${levelData.image}')`;
+
             updateImageBlur();
             hideResultModal();
 
@@ -458,16 +536,19 @@
         }
 
         function updateImageBlur() {
-            const blurValue = Math.max(minBlur, initialBlur - (openedPieces * blurStep));
+            const blurValue = Math.max(minBlur, initialBlur - openedPieces * blurStep);
             document.getElementById("game-image").style.filter =
-                `blur(${blurValue}px) brightness(0.88) saturate(0.95)`;
+                `blur(${blurValue}px) brightness(0.82) saturate(0.92)`;
         }
 
         function triggerQuestion(index) {
             if (gameLocked) return;
 
             const piece = document.querySelector(`.piece[data-index="${index}"]`);
-            if (!piece || piece.classList.contains("hidden")) return;
+
+            if (!piece || piece.classList.contains("hidden")) {
+                return;
+            }
 
             selectedPieceIdx = index;
             document.getElementById("modal-text").innerText = gameLevels[currentLevel].questions[index];
@@ -477,10 +558,15 @@
         function submitQuestionAnswer(userChoice) {
             document.getElementById("quiz-modal").style.display = "none";
 
-            if (gameLocked || selectedPieceIdx === null) return;
+            if (gameLocked || selectedPieceIdx === null) {
+                return;
+            }
 
             const piece = document.querySelector(`.piece[data-index="${selectedPieceIdx}"]`);
-            if (!piece || piece.classList.contains("hidden")) return;
+
+            if (!piece || piece.classList.contains("hidden")) {
+                return;
+            }
 
             const currentLevelData = gameLevels[currentLevel];
 
@@ -505,13 +591,15 @@
             if (gameLocked) return;
 
             const guess = document.getElementById("user-guess").value.trim().toLowerCase();
-            const correctAnswers = gameLevels[currentLevel].answer;
 
-            if (!guess) return;
+            if (!guess) {
+                return;
+            }
+
+            const correctAnswers = gameLevels[currentLevel].answer;
 
             if (correctAnswers.includes(guess)) {
                 gameLocked = true;
-                levelCompleted = true;
                 totalScore += currentLvlScore;
                 updateUI();
                 showWinModal();
@@ -529,10 +617,11 @@
 
         function showWinModal() {
             const levelData = gameLevels[currentLevel];
+            const levelNumber = currentLevel + 1;
 
             document.getElementById("result-title").innerText = "Congratulations!";
             document.getElementById("result-text").innerText =
-                "You guessed the object correctly and completed Level 1.";
+                `You guessed the object correctly and completed Level ${levelNumber}.`;
             document.getElementById("result-score").innerText =
                 `Level score: ${currentLvlScore} | Total score: ${totalScore}`;
 
@@ -541,7 +630,7 @@
             resultImage.style.display = "block";
 
             document.getElementById("result-buttons").innerHTML = `
-                <a class="button-link" href="${levelData.image}" download="quizze_level_1_photo.jpeg">Save Photo</a>
+                <a class="button-link" href="${levelData.image}" download="quizze_level_${levelNumber}_photo">Save Photo</a>
                 <button onclick="retryCurrentLevel()" class="secondary-btn">Play Again</button>
                 <button onclick="nextLevel()">Next Level</button>
             `;
@@ -551,11 +640,10 @@
 
         function showLoseModal() {
             gameLocked = true;
-            levelCompleted = false;
 
             document.getElementById("result-title").innerText = "Level failed";
             document.getElementById("result-text").innerText =
-                "You ran out of points. You can try the level again from the beginning.";
+                "You ran out of points. You can try this level again from the beginning.";
             document.getElementById("result-score").innerText =
                 `Level score: 0 | Total score: ${totalScore}`;
 
@@ -577,7 +665,6 @@
         function retryCurrentLevel() {
             hideResultModal();
 
-            // rollback score of the current level if it had already been added after victory
             totalScore = levelStartTotalScore;
             updateUI();
 
