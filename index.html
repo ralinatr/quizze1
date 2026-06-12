@@ -243,6 +243,13 @@
             gap: 10px;
         }
 
+        .progress-panel {
+            width: 100%;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+        }
+
         input {
             flex: 1;
             padding: 12px;
@@ -276,6 +283,16 @@
             filter: brightness(1.08);
         }
 
+        .secondary-btn {
+            background: #2b4472;
+            color: #fff;
+        }
+
+        .small-btn {
+            font-size: 0.85rem;
+            padding: 9px 14px;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -305,11 +322,13 @@
             line-height: 1.5;
         }
 
-        .modal-buttons {
+        .modal-buttons,
+        .result-buttons {
             display: flex;
             gap: 10px;
             justify-content: center;
             flex-wrap: wrap;
+            margin-top: 10px;
         }
 
         .btn-ans {
@@ -358,19 +377,6 @@
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
         }
 
-        .result-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-
-        .secondary-btn {
-            background: #2b4472;
-            color: #fff;
-        }
-
         @media (max-width: 480px) {
             .stats {
                 font-size: 0.8rem;
@@ -416,6 +422,10 @@
             <input type="text" id="user-guess" placeholder="What is hidden in the photo?">
             <button onclick="makeGuess()">Submit</button>
         </div>
+
+        <div class="progress-panel">
+            <button onclick="confirmResetProgress()" class="secondary-btn small-btn">Reset Progress</button>
+        </div>
     </div>
 
     <div class="modal" id="quiz-modal">
@@ -440,6 +450,7 @@
 
     <script>
         const SECRET_PASSWORD = "hoshi2026";
+        const SAVE_KEY = "privatePuzzleQuizProgress_v1";
 
         const gameLevels = [
             {
@@ -558,10 +569,67 @@
 
         const piecePenalty = 120;
         const wrongGuessPenalty = 100;
-
         const initialBlur = 18;
         const minBlur = 6;
         const blurStep = 1.7;
+
+        function saveProgress(levelIndex = currentLevel, score = totalScore) {
+            try {
+                const progress = {
+                    currentLevel: levelIndex,
+                    totalScore: score
+                };
+
+                localStorage.setItem(SAVE_KEY, JSON.stringify(progress));
+            } catch (error) {
+                console.warn("Progress could not be saved:", error);
+            }
+        }
+
+        function loadProgress() {
+            try {
+                const savedProgress = localStorage.getItem(SAVE_KEY);
+
+                if (!savedProgress) {
+                    return;
+                }
+
+                const progress = JSON.parse(savedProgress);
+
+                if (
+                    typeof progress.currentLevel === "number" &&
+                    typeof progress.totalScore === "number"
+                ) {
+                    currentLevel = Math.max(0, Math.min(progress.currentLevel, gameLevels.length));
+                    totalScore = Math.max(0, progress.totalScore);
+                }
+            } catch (error) {
+                console.warn("Progress could not be loaded:", error);
+                localStorage.removeItem(SAVE_KEY);
+            }
+        }
+
+        function confirmResetProgress() {
+            const shouldReset = confirm("Reset saved progress and start from Level 1?");
+
+            if (shouldReset) {
+                resetProgress();
+            }
+        }
+
+        function resetProgress() {
+            try {
+                localStorage.removeItem(SAVE_KEY);
+            } catch (error) {
+                console.warn("Progress could not be cleared:", error);
+            }
+
+            currentLevel = 0;
+            totalScore = 0;
+            currentLvlScore = 1000;
+            hideResultModal();
+            initGame();
+        }
 
         function checkPassword() {
             const password = document.getElementById("pass-input").value;
@@ -569,6 +637,8 @@
             if (password === SECRET_PASSWORD) {
                 document.getElementById("auth-screen").style.display = "none";
                 document.getElementById("game-content").style.display = "flex";
+
+                loadProgress();
                 initGame();
             } else {
                 alert("Incorrect password!");
@@ -576,6 +646,19 @@
         }
 
         function initGame() {
+            hideResultModal();
+
+            if (currentLevel >= gameLevels.length) {
+                currentLvlScore = 0;
+                gameLocked = true;
+
+                document.getElementById("lvl").innerText = gameLevels.length;
+                updateUI();
+                showAllCompletedModal();
+
+                return;
+            }
+
             const levelData = gameLevels[currentLevel];
 
             levelStartTotalScore = totalScore;
@@ -585,15 +668,13 @@
             gameLocked = false;
 
             document.getElementById("lvl").innerText = currentLevel + 1;
-            document.getElementById("lvl-score").innerText = currentLvlScore;
-            document.getElementById("total-score").innerText = totalScore;
             document.getElementById("user-guess").value = "";
 
             const gameImage = document.getElementById("game-image");
             gameImage.style.backgroundImage = `url('${levelData.image}')`;
 
+            updateUI();
             updateImageBlur();
-            hideResultModal();
 
             const box = document.getElementById("puzzle-box");
             box.innerHTML = "";
@@ -615,6 +696,7 @@
 
         function updateImageBlur() {
             const blurValue = Math.max(minBlur, initialBlur - openedPieces * blurStep);
+
             document.getElementById("game-image").style.filter =
                 `blur(${blurValue}px) brightness(0.82) saturate(0.92)`;
         }
@@ -660,6 +742,7 @@
                 piece.classList.add("hidden");
                 openedPieces++;
                 currentLvlScore = Math.max(0, currentLvlScore - piecePenalty);
+
                 updateImageBlur();
                 updateUI();
 
@@ -687,6 +770,10 @@
             if (correctAnswers.includes(guess)) {
                 gameLocked = true;
                 totalScore += currentLvlScore;
+
+                const nextProgressLevel = Math.min(currentLevel + 1, gameLevels.length);
+                saveProgress(nextProgressLevel, totalScore);
+
                 updateUI();
                 showWinModal();
             } else {
@@ -704,6 +791,8 @@
         function showWinModal() {
             const levelData = gameLevels[currentLevel];
             const levelNumber = currentLevel + 1;
+            const isLastLevel = currentLevel >= gameLevels.length - 1;
+            const nextButtonText = isLastLevel ? "Finish Game" : "Next Level";
 
             document.getElementById("result-title").innerText = "Congratulations!";
             document.getElementById("result-text").innerText =
@@ -720,7 +809,7 @@
             document.getElementById("result-buttons").innerHTML = `
                 <a class="button-link" href="${levelData.image}" download="quizze_level_${levelNumber}_photo.${fileExtension}">Save Photo</a>
                 <button onclick="retryCurrentLevel()" class="secondary-btn">Play Again</button>
-                <button onclick="nextLevel()">Next Level</button>
+                <button onclick="nextLevel()">${nextButtonText}</button>
             `;
 
             document.getElementById("result-modal").style.display = "flex";
@@ -746,6 +835,24 @@
             document.getElementById("result-modal").style.display = "flex";
         }
 
+        function showAllCompletedModal() {
+            document.getElementById("result-title").innerText = "All available levels completed!";
+            document.getElementById("result-text").innerText =
+                "Congratulations! You completed all current levels. The next part of the game is coming soon.";
+            document.getElementById("result-score").innerText =
+                `Total score: ${totalScore}`;
+
+            const resultImage = document.getElementById("result-image");
+            resultImage.src = "";
+            resultImage.style.display = "none";
+
+            document.getElementById("result-buttons").innerHTML = `
+                <button onclick="resetProgress()">Play From Start</button>
+            `;
+
+            document.getElementById("result-modal").style.display = "flex";
+        }
+
         function hideResultModal() {
             document.getElementById("result-modal").style.display = "none";
         }
@@ -754,6 +861,7 @@
             hideResultModal();
 
             totalScore = levelStartTotalScore;
+            saveProgress(currentLevel, totalScore);
             updateUI();
 
             initGame();
@@ -764,9 +872,12 @@
 
             if (currentLevel < gameLevels.length - 1) {
                 currentLevel++;
+                saveProgress(currentLevel, totalScore);
                 initGame();
             } else {
-                alert("The next level is coming soon!");
+                currentLevel = gameLevels.length;
+                saveProgress(currentLevel, totalScore);
+                initGame();
             }
         }
 
